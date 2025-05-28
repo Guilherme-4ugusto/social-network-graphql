@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  username    String        @unique
+  email       String        @unique
+  name        String
+  createdAt   DateTime      @default(now())
+  disabledAt  DateTime?
+  followers   Follow[]      @relation("Followers")
+  following   Follow[]      @relation("Following")
+  post        Post[]        @relation("PostedBy")
+  postComment PostComment[] @relation("UserComments")
+  PostLike    PostLike[]    @relation("Like")
+}
+
+model Follow {
+  follower   User     @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followerId Int
+  followed   User     @relation("Followers", fields: [followedId], references: [id], onDelete: Cascade)
+  followedId Int
+  followedAt DateTime @default(now())
+
+  @@id([followerId, followedId])
+}
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  caption     String?
+  archivedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  postImage   PostImage[]   @relation("PostImages")
+  creator     User          @relation("PostedBy", fields: [creatorId], references: [id], onDelete: Cascade)
+  creatorId   Int
+  postLike    PostLike[]    @relation("Liked")
+  postComment PostComment[] @relation("Comments")
+}
+
+model PostImage {
+  id       Int     @id @default(autoincrement())
+  imageUrl String?
+  post     Post    @relation("PostImages", fields: [postId], references: [id], onDelete: Cascade)
+  postId   Int
+}
+
+model PostComment {
+  id       Int    @id @default(autoincrement())
+  comment  String
+  post     Post   @relation("Comments", fields: [postId], references: [id], onDelete: Cascade)
+  postId   Int
+  author   User   @relation("UserComments", fields: [authorId], references: [id], onDelete: Cascade)
+  authorId Int
+}
+
+model PostLike {
+  post   Post @relation("Liked", fields: [postId], references: [id], onDelete: Cascade)
+  postId Int
+
+  user   User @relation("Like", fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  likedAt DateTime
+
+  @@id([postId, userId])
+}
