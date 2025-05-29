@@ -1,5 +1,6 @@
 import { IsEmail, IsUrl } from "class-validator";
 import { Field, InputType } from "type-graphql";
+import { PostImageInput } from "./creat-post-image-input";
 
 @InputType()
 export class CreatePostInput {
@@ -7,5 +8,8 @@ export class CreatePostInput {
     caption?: string
 
     @Field()
-    userId: string
+    creatorId: number
+
+    @Field(() => [PostImageInput])
+    imagesUrls: PostImageInput[]
 }
