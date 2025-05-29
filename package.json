@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev:simple": "tsnd --respawn --transpile-only simple-server.ts",
-    "dev": "tsnd --respawn --transpile-only src/server.ts"
+    "dev": "tsnd --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "keywords": [],
   "author": "",
