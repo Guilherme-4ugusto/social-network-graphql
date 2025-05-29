@@ -19,6 +19,7 @@
 | **GraphQL**     | Apollo Server, TypeGraphQL           |
 | **Database**    | Prisma ORM (PostgreSQL)              |
 | **Config**      | dotenv (variáveis de ambiente)       |
+| **Container**   | Docker, Docker Compose               |
 
 ---
 
@@ -31,8 +32,14 @@ graphql-api/
 │   └── schema.prisma  # 📝 Schema do Prisma
 ├── src/
 │   ├── dtos/          # 📦 DTOs/Inputs GraphQL
+|       ├── inputs/     # 📥 Inputs GraphQL
+|       └─  models/     # 🧬 Models GraphQL
+|   ├── errors/        # ⚠️ Erros personalizados (regras de negócio)
 │   ├── resolvers/     # 🔄 Resolvers (TypeGraphQL)
 │   └── server.ts      # ⚡ Entrada do Apollo Server
+├── Dockerfile         # 🐳 Imagem da API
+├── docker-compose.yml # 🐙 Orquestração dos serviços
+├── wait-for-db.sh     # ⏳ Script de espera pelo banco
 ├── .env               # 🔒 Variáveis de ambiente (não versionado)
 ├── package.json
 ├── tsconfig.json
@@ -41,7 +48,7 @@ graphql-api/
 
 ---
 
-### ⚙️ Configuração Inicial
+### ⚙️ Configuração Inicial (sem Docker)
 
 1. Instale as dependências:
 
@@ -55,16 +62,75 @@ npm install
 DATABASE_URL="sua_string_de_conexão_com_postgres"
 ```
 
+3. Gere o client do Prisma e rode as migrações:
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
 ---
 
-### 🎯 Comandos Úteis
+### 🐳 Usando Docker
+
+Você pode construir e executar a aplicação usando apenas Docker:
+
+```bash
+docker build -t graphql-api .
+docker run -p 3000:3000 graphql-api
+```
+
+---
+
+### 🐙 Usando Docker Compose
+
+Para rodar a aplicação com banco de dados incluso:
+
+```bash
+docker-compose up --build
+```
+
+Isso criará dois containers: um para o PostgreSQL e outro para a API.
+
+---
+
+### 📦 Scripts disponíveis
+
+| Script             | Ação                                      |
+|--------------------|-------------------------------------------|
+| `npm run dev`      | Inicia servidor com hot-reload (dev)      |
+| `npm run build`    | Compila o projeto TypeScript               |
+| `npm start`        | Inicia a API a partir da build            |
+
+---
+
+### 🎯 Comandos Prisma
 
 | Comando                            | Ação                                   |
 |------------------------------------|----------------------------------------|
-| `npm run dev`                      | ▶️ Inicia servidor com hot-reload      |
-| `npx prisma migrate dev --name init` | 🛠️ Cria/executa migrações do banco    |
-| `npx prisma generate`              | 🔄 Regenera o Prisma Client            |
-| `npx prisma studio`                | 🔍 Abre interface visual do banco      |
+| `npx prisma migrate dev`           | Executa migrações do banco (dev)       |
+| `npx prisma migrate deploy`        | Executa migrações em produção          |
+| `npx prisma generate`              | Regenera o Prisma Client               |
+| `npx prisma studio`                | Abre interface visual do banco         |
+
+---
+
+### ⚙️ Variáveis de Ambiente
+
+Exemplo de `.env`:
+
+```
+#APP Env
+DATABASE_URL=postgresql://admin:admin@localhost:5432/homolog
+APP_PORT=3001
+
+#BD Env
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=mydatabase
+```
+
+> 🔒 Nunca adicione o `.env` ao controle de versão (adicione ao `.gitignore`).
 
 ---
 
@@ -74,7 +140,7 @@ DATABASE_URL="sua_string_de_conexão_com_postgres"
   Sempre execute `npx prisma migrate dev` após alterar `schema.prisma`
 
 - 🔒 **Segurança**  
-  🙈 Nunca versie `.env` - Adicione ao `.gitignore` e use `example.env` como template
+  🙈 Nunca versione `.env` - Adicione ao `.gitignore` e use o exemplo acima como template
 
 - 🧩 **TypeGraphQL**  
   Utilize decorators (`@ObjectType`, `@Field`) para definir schemas
@@ -102,6 +168,7 @@ DATABASE_URL="sua_string_de_conexão_com_postgres"
 | **GraphQL**      | Apollo Server, TypeGraphQL           |
 | **Database**     | Prisma ORM (PostgreSQL)              |
 | **Config**       | dotenv (environment variables)       |
+| **Container**    | Docker, Docker Compose               |
 
 ---
 
@@ -114,8 +181,14 @@ graphql-api/
 │   └── schema.prisma  # 📝 Prisma Schema
 ├── src/
 │   ├── dtos/          # 📦 DTOs/Inputs for GraphQL
+|       ├── inputs/     # 📥 Inputs for GraphQL
+|       └─  models/     # 🧬 Models for GraphQL
+|   ├── errors/        # ⚠️ Custom errors (business rules) 
 │   ├── resolvers/     # 🔄 Resolvers (TypeGraphQL)
 │   └── server.ts      # ⚡ Apollo Server entry point
+├── Dockerfile         # 🐳 API container
+├── docker-compose.yml # 🐙 Services orchestration
+├── wait-for-db.sh     # ⏳ DB wait script
 ├── .env               # 🔒 Env variables (not versioned)
 ├── package.json
 ├── tsconfig.json
@@ -124,7 +197,7 @@ graphql-api/
 
 ---
 
-### ⚙️ Initial Setup
+### ⚙️ Initial Setup (without Docker)
 
 1. Install dependencies:
 
@@ -138,16 +211,60 @@ npm install
 DATABASE_URL="your_postgres_connection_string"
 ```
 
+3. Generate Prisma client and run migrations:
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
 ---
 
-### 🎯 Useful Commands
+### 🐳 Using Docker
 
-| Command                             | Description                             |
-|-------------------------------------|-----------------------------------------|
-| `npm run dev`                       | ▶️ Starts dev server with hot-reload    |
-| `npx prisma migrate dev --name init` | 🛠️ Run database migrations              |
-| `npx prisma generate`               | 🔄 Regenerate Prisma Client             |
-| `npx prisma studio`                 | 🔍 Open Prisma Studio (GUI)             |
+Build and run with Docker:
+
+```bash
+docker build -t graphql-api .
+docker run -p 3000:3000 graphql-api
+```
+
+---
+
+### 🐙 Using Docker Compose
+
+Run app with PostgreSQL container:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### 📦 Available Scripts
+
+| Script             | Description                            |
+|--------------------|----------------------------------------|
+| `npm run dev`      | Start dev server with hot-reload       |
+| `npm run build`    | Compile TypeScript project              |
+| `npm start`        | Start API from compiled build           |
+
+---
+
+### ⚙️ Environment Variables
+
+`.env` example:
+
+```
+#APP Env
+DATABASE_URL=postgresql://admin:admin@localhost:5432/homolog
+APP_PORT=3001
+
+#DB Env
+POSTGRES_USER=admin
+POSTGRES_PASSWORD=admin
+POSTGRES_DB=mydatabase
+```
 
 ---
 
@@ -157,7 +274,7 @@ DATABASE_URL="your_postgres_connection_string"
   Always run `npx prisma migrate dev` after modifying `schema.prisma`
 
 - 🔒 **Security**  
-  🙈 Never version `.env` — Add it to `.gitignore` and use an `example.env` as template
+  🙈 Never version .env - Add to .gitignore and use the example above as a template
 
 - 🧩 **TypeGraphQL**  
   Use decorators (`@ObjectType`, `@Field`) to define GraphQL schemas
