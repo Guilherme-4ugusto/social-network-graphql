@@ -31,11 +31,21 @@ type Mutation {
   createFollow(data: CreateFollowUserInput!): Follow!
   createUser(data: CreateUserInput!): User!
   desactivateUser(userId: Float!): String!
+  unfollow(followedId: Float!, followerId: Float!): String!
   updateUser(data: UpdateUserInput!, userId: Float!): User!
+}
+
+type Post {
+  archivedAt: DateTimeISO
+  caption: String
+  createdAt: DateTimeISO!
+  creator: User
+  id: Float!
 }
 
 type Query {
   follow: [Follow!]!
+  posts: [Post!]!
   user(userId: Float!): User
   users(active: Boolean): [User!]!
 }
