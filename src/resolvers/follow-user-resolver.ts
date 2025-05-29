@@ -7,7 +7,7 @@ import { UserCannotFollowHimselfError } from "../errors/user-cannot-follow-himse
 
 export const prisma = new PrismaClient();
 
-export class FollowUserResolver{
+export class FollowUserResolver {
     @Query(() => [Follow])
     async follow(): Promise<Follow[]> {
         return prisma.follow.findMany({
@@ -19,16 +19,29 @@ export class FollowUserResolver{
     }
 
     @Mutation(() => Follow)
-        async createFollow(@Arg("data") data: CreateFollowUserInput): Promise<Follow> {
-        if(data.followedId === data.followerId){
+    async createFollow(@Arg("data") data: CreateFollowUserInput): Promise<Follow> {
+        if (data.followedId === data.followerId) {
             throw new UserCannotFollowHimselfError("USER_CANNOT_FOLLOW_HIMSELF")
         }
-        return prisma.follow.create({ 
+        return prisma.follow.create({
             data,
             include: {
                 followed: true,
                 follower: true
             }
         });
+    }
+
+    @Mutation(() => String)
+    async unfollow(@Arg("followerId") followerId: number, @Arg("followedId") followedId: number) {
+        await prisma.follow.delete({
+            where: {
+                followerId_followedId: {
+                    followerId: followerId,
+                    followedId: followedId
+                }
+            }
+        })
+        return `User ${followerId} unfollowed user ${followedId}`
     }
 }

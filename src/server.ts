@@ -8,6 +8,7 @@ import { UserResolver } from "./resolvers/user-resolver";
 import { FollowUserResolver } from "./resolvers/follow-user-resolver";
 import { UserFieldResolver } from "./resolvers/user-field-resolver ";
 import { startStandaloneServer } from '@apollo/server/standalone';
+import { PostResolver } from "./resolvers/post-resolver";
 
 
 require("dotenv").config();
@@ -15,7 +16,7 @@ require("dotenv").config();
 async function bootstrap() {
     const schema = await buildSchema({
         resolvers: [
-            UserResolver, FollowUserResolver, UserFieldResolver
+            UserResolver, FollowUserResolver, UserFieldResolver, PostResolver
         ],
         validate: true,
         emitSchemaFile: path.resolve(__dirname, 'schema.gql')
