@@ -16,5 +16,5 @@ export class Follow {
   followed?: User
 
   @Field()
-  followedAt: Date
+  createdAt: Date
 }

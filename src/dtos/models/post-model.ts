@@ -1,5 +1,7 @@
 import { Field, ObjectType } from "type-graphql";
 import { User } from "./user-model";
+import { PostImage } from "./post-image-model";
+import { PostComment } from "./post-comment-model";
 
 @ObjectType()
 export class Post {
@@ -17,4 +19,10 @@ export class Post {
 
     @Field(() => Date, { nullable: true })
     archivedAt?: Date | null
+
+    @Field(() => [PostImage], { nullable: true })
+    postImage?: PostImage[] | null
+
+    @Field(() => [PostComment], { nullable: true })
+    postComment?: PostComment[] | null
 } 
